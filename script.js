@@ -104,7 +104,7 @@ const shipFactory = (l, w) => {
   // every time a position hit is one where ship is present, decrease length by one and log position
 
   ship.hit = function (pos) {
-    this.positionsHit.push(pos);
+    this.positions.includes(pos) ? this.positionsHit.push(pos) : null;
   };
 
   ship.isSunk = function () {
