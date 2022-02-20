@@ -1,6 +1,9 @@
 const grid = document.querySelector(".grid-container");
 
-// dimensions must be even always - only give options for 20 or less
+// dimensions must be even always - only give options for between 10 and 20
+// large map = [20,20] --> ship sizes = 6 x 3
+// regular map = [16,16]  --> ship sizes = 5 x 2
+// small map = [10,10] --> ship sizes = 4 x 1
 
 let dimensions = [10, 10];
 
@@ -24,6 +27,11 @@ function registerGridItemClick(e) {
 createGrid();
 
 const gridItems = document.querySelectorAll(".grid-item");
+
+// display id numbers for each grid
+for (let item of gridItems) {
+  item.innerText = item.id;
+}
 
 // to add a boundary line between top and bottom half of gameboard
 for (let item of gridItems) {
