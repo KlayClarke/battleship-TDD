@@ -96,11 +96,17 @@ const shipFactory = (l, w) => {
 
   ship.dimensions = [ship.length, ship.width];
 
-  ship.topLeftCornerCoord = [];
+  ship.topLeftCornerCoord = 0;
 
   ship.positions = [];
 
   ship.positionsHit = [];
+
+  ship.addToBoard = function (num) {
+    // takes a number and adds ship to board with ship top left corner being placed at the grid item with num id
+    this.topLeftCornerCoord = num;
+  };
+
   // every time a position hit is one where ship is present, decrease length by one and log position
 
   ship.hit = function (pos) {
