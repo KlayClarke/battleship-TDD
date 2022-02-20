@@ -1,19 +1,10 @@
-// init gameboard
-// init ship one
-// push ship to gameboard
-// init ship two
-// push ship to gameboard
-
-// gameboard factory
-// gameboard should be able to place ships at specific coords by calling ship factory
-// gameboard should have a recieveAttack() function that takes a pair of coords, determines whether the attack hit a ship, sends the hit function if hit || records coords of missed shot
-// gameboard should keep track of missed attacks so they can display them properly
-// gameboard should be able to report whether or not all of their ships have been sunk
-
-const gameBoard = () => {
+const gameBoard = (l, w) => {
   const board = {};
 
-  board.dimensions = [10, 10];
+  board.length = l;
+  board.width = w;
+
+  board.dimensions = [board.length, board.width];
 
   board.ships = [];
 
@@ -23,6 +14,65 @@ const gameBoard = () => {
     this.ships.push([ship, ship.topLeftCornerCoord]);
   };
 
+  board.checkPositions = function () {
+    let shipOne = this.ships[0];
+    let shipTwo = this.ships[1];
+    let shipOneLength = shipOne[0]["length"];
+    let shipOneWidth = shipOne[0]["width"];
+    let shipTwoLength = shipTwo[0]["length"];
+    let shipTwoWidth = shipTwo[0]["width"];
+    let shipOneTopLeftCornerX = shipOne[0]["topLeftCornerCoord"][0];
+    let shipOneTopLeftCornerY = shipOne[0]["topLeftCornerCoord"][1];
+    let shipTwoTopLeftCornerX = shipTwo[0]["topLeftCornerCoord"][0];
+    let shipTwoTopLeftCornerY = shipTwo[0]["topLeftCornerCoord"][1];
+
+    // check shipOne x coord: must be between 1 and board length - (ship length - 1)
+    if (
+      !(
+        shipOneTopLeftCornerX >= 1 &&
+        shipOneTopLeftCornerX <= this.length - (shipOneLength - 1)
+      )
+    ) {
+      console.log("Ship One X");
+      return false;
+    }
+
+    // check shipOne y coord: must be between 1 and board width / 2 - (ship width - 1)
+    if (
+      !(
+        shipOneTopLeftCornerY >= 1 &&
+        shipOneTopLeftCornerY <= this.width / 2 - (shipOneWidth - 1)
+      )
+    ) {
+      console.log("Ship One Y");
+      return false;
+    }
+
+    // check shiptwo x coord - between 1 and board length - (ship length - 1)
+    if (
+      !(
+        shipTwoTopLeftCornerX >= 1 &&
+        shipTwoTopLeftCornerX <= this.length - (shipTwoLength - 1)
+      )
+    ) {
+      console.log("Ship Two X");
+      return false;
+    }
+
+    // check shiptwo y coord - between (board width / 2) + 1 and board width - (ship width - 1)
+    if (
+      !(
+        shipTwoTopLeftCornerY > this.width / 2 &&
+        shipTwoTopLeftCornerY <= this.width - (shipTwoWidth - 1)
+      )
+    ) {
+      console.log("Ship Two Y");
+      return false;
+    }
+
+    return true;
+  };
+
   board.recieveAttack = function (attackedShip, attackedCoords) {
     attackedShip.positions.contains(attackedCoords)
       ? attackedShip.hit(attackedCoords)
@@ -30,20 +80,24 @@ const gameBoard = () => {
   };
 
   board.changeDimensions = function (newLength, newWidth) {
-    board.dimensions = [newLength, newWidth];
+    board.length = newLength;
+    board.width = newWidth;
+    board.dimensions = [board.length, board.width];
   };
 
   return board;
 };
 
-const shipFactory = () => {
+const shipFactory = (l, w) => {
   const ship = {};
 
-  ship.length = 4;
-  ship.width = 1;
-  ship.dimensions = ship.length * ship.width;
+  ship.length = l;
+  ship.width = w;
+
+  ship.dimensions = [ship.length, ship.width];
 
   ship.topLeftCornerCoord = [];
+
   ship.positions = [];
 
   ship.positionsHit = [];
@@ -60,18 +114,58 @@ const shipFactory = () => {
   return ship;
 };
 
-let gameboard = gameBoard();
-let shipOne = shipFactory();
-let shipTwo = shipFactory();
+function checkShipOnePosition(
+  shipOneLength,
+  shipOneWidth,
+  shipOneX,
+  shipOneY,
+  boardLength,
+  boardWidth
+) {
+  // check shipOne x coord: must be between 1 and board length - (ship length - 1)
+  if (!(shipOneX >= 1 && shipOneX <= boardLength - (shipOneLength - 1))) {
+    console.log("Ship One X");
+    return false;
+  }
 
-gameboard.addShip(shipOne, 2, 7);
-gameboard.addShip(shipTwo, 4, 2);
+  // check shipOne y coord: must be between 1 and board width / 2 - (ship width - 1)
+  if (!(shipOneY >= 1 && shipOneY <= boardWidth / 2 - (shipOneWidth - 1))) {
+    console.log("Ship One Y");
+    return false;
+  }
 
-console.log(gameboard.ships);
+  return true;
+}
+
+function checkShipTwoPosition(
+  shipTwoLength,
+  shipTwoWidth,
+  shipTwoX,
+  shipTwoY,
+  boardLength,
+  boardWidth
+) {
+  // check shiptwo x coord - between 1 and board length - (ship length - 1)
+  if (!(shipTwoX >= 1 && shipTwoX <= boardLength - (shipTwoLength - 1))) {
+    console.log("Ship Two X");
+    return false;
+  }
+
+  // check shiptwo y coord - between (board width / 2) + 1 and board width - (ship width - 1)
+  if (
+    !(shipTwoY > boardWidth / 2 && shipTwoY <= boardWidth - (shipTwoWidth - 1))
+  ) {
+    console.log("Ship Two Y");
+    return false;
+  }
+  return true;
+}
 
 module.exports = {
   gameBoard,
   shipFactory,
+  checkShipOnePosition,
+  checkShipTwoPosition,
 };
 
 // create player
