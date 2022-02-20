@@ -14,14 +14,13 @@
   border: 1px solid rgb(255, 255, 255);
   display: inline-flex;
   background-color: rgba(16, 112, 112, 0.546);
-}
-
-.grid-item:hover {
-  background-color: lightgray;
-  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+  color: rgb(255, 255, 255);
 }
 
 .target:hover {
+  background-color: lightgray;
   cursor: crosshair;
 }
 
