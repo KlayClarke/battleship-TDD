@@ -15,8 +15,9 @@ const gameBoard = (l, w) => {
   };
 
   board.checkPositions = function () {
-    let shipOne = this.ships[0];
-    let shipTwo = this.ships[1];
+    let userShip = this.ships[1];
+    let userShipPosition = this.ships[1];
+
     let shipOneLength = shipOne[0]["length"];
     let shipOneWidth = shipOne[0]["width"];
     let shipTwoLength = shipTwo[0]["length"];
@@ -88,35 +89,39 @@ const gameBoard = (l, w) => {
   return board;
 };
 
-const shipFactory = (l, w) => {
+const shipFactory = (length, width, position) => {
   const ship = {};
 
-  ship.length = l;
-  ship.width = w;
+  ship.length = length;
+  ship.width = width;
 
   ship.dimensions = [ship.length, ship.width];
 
-  ship.topLeftCornerCoord = 0;
+  ship.topLeftCornerPosition = position;
 
-  ship.positions = [];
+  // a list of each grid that contains a piece of this ship
+  ship.allPositions = [];
 
+  // a list of all positions hit
   ship.positionsHit = [];
 
+  // takes a number and adds ship to board with ship top left corner being placed at the grid item with num id
   ship.addToBoard = function (num) {
-    // takes a number and adds ship to board with ship top left corner being placed at the grid item with num id
     this.topLeftCornerCoord = num;
   };
 
-  // every time a position hit is one where ship is present, decrease length by one and log position
-
+  // every time a ship's position is hit, decrease length by one and log position
   ship.hit = function (pos) {
     this.positions.includes(pos) ? this.positionsHit.push(pos) : null;
+    this.positions.filter((position) => position != pos);
   };
 
+  // if ship has no positions left, it has sunk - return true, else false
   ship.isSunk = function () {
-    return this.length == 0 ? true : false;
+    return this.allPositions.length == 0 ? true : false;
   };
 
+  console.log(ship);
   return ship;
 };
 
