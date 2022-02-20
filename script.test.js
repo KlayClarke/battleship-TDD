@@ -1,10 +1,11 @@
-import { shipFactory, gameBoard } from "./script";
+import { shipFactory, gameBoard, mockPositionCheck } from "./script";
+import { checkShipOnePosition, checkShipTwoPosition } from "./script";
 
-let gameboard = gameBoard();
-let shipOne = shipFactory();
-let shipTwo = shipFactory();
-shipOne.topLeftCornerCoord = [2, 7];
-shipTwo.topLeftCornerCoord = [4, 2];
+let gameboard = gameBoard(10, 10);
+let shipOne = shipFactory(4, 1);
+let shipTwo = shipFactory(4, 1);
+shipOne.topLeftCornerCoord = [5, 1];
+shipTwo.topLeftCornerCoord = [1, 5];
 gameboard.addShip(shipOne);
 gameboard.addShip(shipTwo);
 
@@ -13,14 +14,7 @@ test("test ship is sunk", () => {
 });
 
 test("test ship dimension", () => {
-  expect(shipTwo.dimensions).toBe(4);
-});
-
-test("test add ship", () => {
-  expect(gameboard.ships).toEqual([
-    [shipOne, [2, 7]],
-    [shipTwo, [4, 2]],
-  ]);
+  expect(shipTwo.dimensions).toEqual([4, 1]);
 });
 
 test("test ship hit", () => {
@@ -37,4 +31,50 @@ test("test gameboard change dimensions mechanic ", () => {
   expect(gameboard.dimensions).toEqual([15, 15]);
 });
 
-// only have to test objects public interface (methods and properties that are used out of the ship object / interact with code out of the object)
+test("test position of small ship one for 20 x 20 grid", () => {
+  let shipL = 5;
+  let shipW = 1;
+  let shipX = 4;
+  let shipY = 1;
+  let boardL = 20;
+  let boardW = 20;
+  expect(checkShipOnePosition(shipL, shipW, shipX, shipY, boardL, boardW)).toBe(
+    true
+  );
+});
+
+test("test position of small ship one for 20 x 20 grid", () => {
+  let shipL = 5;
+  let shipW = 2;
+  let shipX = 1;
+  let shipY = 11;
+  let boardL = 20;
+  let boardW = 20;
+  expect(checkShipTwoPosition(shipL, shipW, shipX, shipY, boardL, boardW)).toBe(
+    true
+  );
+});
+
+test("test position of big ship one touching border of 100 x 100 grid", () => {
+  let shipL = 13;
+  let shipW = 10;
+  let shipX = 88;
+  let shipY = 41;
+  let boardL = 100;
+  let boardW = 100;
+  expect(checkShipOnePosition(shipL, shipW, shipX, shipY, boardL, boardW)).toBe(
+    true
+  );
+});
+
+test("test position of big ship two touching border of 100 x 100 grid", () => {
+  let shipL = 20;
+  let shipW = 2;
+  let shipX = 81;
+  let shipY = 51;
+  let boardL = 100;
+  let boardW = 100;
+  expect(checkShipTwoPosition(shipL, shipW, shipX, shipY, boardL, boardW)).toBe(
+    true
+  );
+});
