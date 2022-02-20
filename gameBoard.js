@@ -3,9 +3,9 @@ const grid = document.querySelector(".grid-container");
 // dimensions must be even always - only give options for between 10 and 20
 // large map = [20,20] --> ship sizes = 6 x 3
 // regular map = [16,16]  --> ship sizes = 5 x 2
-// small map = [10,10] --> ship sizes = 4 x 1
+// small map = [10,10] --> ship sizes = 4 x 2
 
-let dimensions = [10, 10];
+let dimensions = [16, 16];
 
 let dmzLine = (dimensions[0] * dimensions[1]) / 2 + 1;
 
