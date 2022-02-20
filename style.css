@@ -19,3 +19,11 @@
   background-color: lightgray;
   cursor: pointer;
 }
+
+.target:hover {
+  cursor: crosshair;
+}
+
+.disable:hover {
+  cursor: not-allowed;
+}
