@@ -9,17 +9,13 @@ let userShip = shipFactory(4, 1);
 gameboard.addShip(cpuShip);
 gameboard.addShip(userShip);
 
+cpuShip.setInitialPosition(37);
+cpuShip.setAllPositions();
+
+userShip.setInitialPosition(75);
+userShip.setAllPositions();
+
 // mock initialization end
-
-test("test ship factory add initial position", () => {
-  cpuShip.setInitialPosition(37);
-  expect(cpuShip.initalPosition).toBe(37);
-});
-
-test("test board check user position", () => {
-  userShip.setInitialPosition(35);
-  expect(gameboard.checkUserShipPosition()).toBe(false);
-});
 
 test("test ship dimensions are equal", () => {
   expect(cpuShip.dimensions).toEqual(userShip.dimensions);
@@ -29,7 +25,17 @@ test("test ship dimensions are correct", () => {
   expect(userShip.dimensions).toEqual([4, 1]);
 });
 
-test("user ship positioned in cpu territory", () => {
+test("test ship factory set initial position", () => {
+  cpuShip.setInitialPosition(37);
+  expect(cpuShip.initalPosition).toBe(37);
+});
+
+test("test board check user position for position in legal spot", () => {
+  userShip.setInitialPosition(65);
+  expect(gameboard.checkUserShipPosition()).toBe(false);
+});
+
+test("test user ship positioned in cpu territory", () => {
   userShip.setInitialPosition(12);
   expect(
     checkUserShipPosition(
@@ -41,7 +47,7 @@ test("user ship positioned in cpu territory", () => {
   ).toBe(false);
 });
 
-test("user ship positioned slightly out of user territory", () => {
+test("test user ship positioned slightly out of user territory", () => {
   userShip.setInitialPosition(78);
   expect(
     checkUserShipPosition(
@@ -53,7 +59,7 @@ test("user ship positioned slightly out of user territory", () => {
   ).toBe(false);
 });
 
-test("user ship positioned within bounds of user territory", () => {
+test("test user ship positioned within bounds of user territory", () => {
   userShip.setInitialPosition(66);
   expect(
     checkUserShipPosition(
@@ -65,7 +71,7 @@ test("user ship positioned within bounds of user territory", () => {
   ).toBe(true);
 });
 
-test("check for cpu ship position randomization min (must equal 1 not 0)", () => {
+test("test for cpu ship position randomization min (must equal 1 not 0)", () => {
   let randoms = [];
   for (let i = 0; i < 100000; i++) {
     let random = cpuShipPositionRandom(
@@ -83,7 +89,7 @@ test("check for cpu ship position randomization min (must equal 1 not 0)", () =>
   expect(randoms[0]).toBe(1);
 });
 
-test("check for cpu ship position randomization max (must be equal to 50 on 10x10 board)", () => {
+test("test for cpu ship position randomization max (must be equal to 50 on 10x10 board)", () => {
   let randoms = [];
   for (let i = 0; i < 100000; i++) {
     let random = cpuShipPositionRandom(
@@ -101,7 +107,7 @@ test("check for cpu ship position randomization max (must be equal to 50 on 10x1
   expect(randoms[99999]).toBe(47);
 });
 
-test("check if cpu ship position randomization returns legal positions", () => {
+test("test if cpu ship position randomization returns legal positions", () => {
   function testBounds() {
     for (let i = 0; i < 10000; i++) {
       let randomNum = cpuShipPositionRandom(
@@ -138,7 +144,7 @@ test("check if cpu ship position randomization returns legal positions", () => {
   expect(testBounds()).toBe(true);
 });
 
-test("check that cpu randomization doesnt return two digit nums ending in 0", () => {
+test("test to ensure cpu randomization doesnt return two digit nums ending in 0", () => {
   function test() {
     for (let i = 0; i < 10000; i++) {
       let num = cpuShipPositionRandom(
@@ -156,14 +162,33 @@ test("check that cpu randomization doesnt return two digit nums ending in 0", ()
   expect(test()).toBe(true);
 });
 
-test("test set all positions param on ship factory", () => {
-  cpuShip.setInitialPosition(37);
-  cpuShip.setAllPositions();
+test("test set all positions param on ship factory of cpu", () => {
   expect(cpuShip.allPositions).toEqual([37, 38, 39, 40]);
 });
 
-test("test set all positions param on ship factory v2", () => {
-  userShip.setInitialPosition(75);
-  userShip.setAllPositions();
+test("test set all positions param on ship factory of user", () => {
   expect(userShip.allPositions).toEqual([75, 76, 77, 78]);
+});
+
+test("test ship hit function on user ship", () => {
+  userShip.hit(76);
+  expect(userShip.allPositions).toEqual([75, 77, 78]);
+});
+
+test("test ship hit function on cpu ship", () => {
+  cpuShip.hit(38);
+  cpuShip.hit(39);
+  expect(cpuShip.allPositions).toEqual([37, 40]);
+});
+
+test("test ship is sunk for cpu ship with all positions undamaged", () => {
+  expect(cpuShip.isSunk()).toBe(false);
+});
+
+test("test ship is sunk for user ship with all positions hit", () => {
+  userShip.hit(75);
+  userShip.hit(76);
+  userShip.hit(77);
+  userShip.hit(78);
+  expect(userShip.isSunk()).toBe(true);
 });
