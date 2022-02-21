@@ -4,6 +4,12 @@
   /* background-color: lightgray; */
 }
 
+#gameboard {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 #lower {
   display: flex;
   flex-direction: column;
@@ -13,14 +19,14 @@
 }
 
 .grid-container {
-  width: 100%;
+  width: 60%;
   display: grid;
 }
 
 .grid-item {
   border: 1px solid rgb(255, 255, 255);
   display: inline-flex;
-  background-color: rgba(16, 112, 112, 0.546);
+  background-color: rgba(46, 180, 180, 0.546);
   align-items: center;
   justify-content: center;
   color: rgb(255, 255, 255);
