@@ -2,6 +2,7 @@ import { gameBoard, shipFactory } from "./script";
 
 const grid = document.querySelector(".grid-container");
 const replayButton = document.querySelector("button");
+const endResultTextContainer = document.querySelector("#end-result");
 
 // must clear gameboard grid before replaying
 // pop up modal with results of current match and replay button
@@ -31,7 +32,7 @@ function play() {
   cpuShip.setAllPositions();
   console.log(cpuShip);
 
-  // set user ship initial position (will take user input for this)
+  // set user ship initial position (will eventually take user input for this)
   userShip.setInitialPosition(72);
 
   // populate user ship's 'all positions' param
@@ -40,6 +41,7 @@ function play() {
 
   // function for gameboard grid creation / setting of dmz line
   function createGrid() {
+    grid.innerHTML = "";
     for (
       let i = 0;
       i < gameboard.dimensions[1] * gameboard.dimensions[0];
@@ -125,10 +127,14 @@ function play() {
     // if cpu ship sunk / user wins
     if (cpuShip.isSunk()) {
       // congratulate user
-      console.log("congratulations user");
+      endResultTextContainer.innerText = "Congratulations. You Won!";
+      // change background color to green (victory)
+      endResultTextContainer.style.backgroundColor = "green";
     } else if (userShip.isSunk()) {
       // cheer user up
-      console.log("sucks to be u");
+      endResultTextContainer.innerText = "We'll get them next time, champ!";
+      // change background color to red (defeat)
+      endResultTextContainer.style.backgroundColor = "red";
     }
   }
 
