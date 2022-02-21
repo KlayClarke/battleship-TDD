@@ -40,3 +40,7 @@
 .disable:hover {
   cursor: not-allowed;
 }
+
+.hit {
+  background-color: black;
+}
