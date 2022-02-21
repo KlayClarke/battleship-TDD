@@ -34,14 +34,12 @@ function play() {
 
   // populate cpu ship's 'all positions' param
   cpuShip.setAllPositions();
-  console.log(cpuShip);
 
   // set user ship initial position (will eventually take user input for this)
   userShip.setInitialPosition(72);
 
   // populate user ship's 'all positions' param
   userShip.setAllPositions();
-  console.log(userShip);
 
   // function for gameboard grid creation / setting of dmz line
   function createGrid() {
@@ -58,8 +56,6 @@ function play() {
       grid.appendChild(div).classList.add("grid-item");
     }
   }
-  // create an initial grid for gameboard
-  createGrid();
 
   // a nodelist of all grid items within gameboard grid
   const gridItems = document.querySelectorAll(".grid-item");
@@ -123,7 +119,27 @@ function play() {
     }
   }
 
-  showUserShipOnGrid();
+  function registerUserHitAttempt(e) {
+    // clear targeted grid's id label
+    removeGridLabel(e.target.id);
+    // mark attempted hit
+    markAttemptedHit(e.target.id);
+    // all cpu ship positions prior to attempted hit
+    let positions = cpuShip.allPositions;
+    // send hit
+    cpuShip.hit(parseInt(e.target.id));
+    // all cpu positions after attempted hit
+    let newPositions = cpuShip.allPositions;
+    // if hit is successful, register hit
+    if (positions.length > newPositions.length) {
+      // mark ship hit
+      markShipHit(e.target.id);
+      // display message explaining result
+      directionsContainer.innerText = "you hit the enemy";
+    }
+    currentTurn++;
+    battle();
+  }
 
   function cpuRandomHitAttempt(boardLength, boardWidth) {
     let max = boardLength * boardWidth;
@@ -158,30 +174,6 @@ function play() {
     return random;
   }
 
-  // if grid item id in cpuShip position, register hit
-  // else handle wrong hit, disallow a hit in same spot - mark hit spots by using X
-  function registerUserHitAttempt(e) {
-    // clear targeted grid's id label
-    removeGridLabel(e.target.id);
-    // mark attempted hit
-    markAttemptedHit(e.target.id);
-    // all cpu ship positions prior to attempted hit
-    let positions = cpuShip.allPositions;
-    // send hit
-    cpuShip.hit(parseInt(e.target.id));
-    // all cpu positions after attempted hit
-    let newPositions = cpuShip.allPositions;
-    // if hit is successful, register hit
-    if (positions.length > newPositions.length) {
-      // mark ship hit
-      markShipHit(e.target.id);
-      // display message explaining result
-      directionsContainer.innerText = "you hit the enemy";
-    }
-    currentTurn++;
-    battle();
-  }
-
   function registerCPUHitAttempt(hitPosition) {
     // clear targeted grid's id label
     removeGridLabel(hitPosition);
@@ -207,7 +199,15 @@ function play() {
     battle();
   }
 
-  // only to be run if gameOver() - checks for winner and displays results
+  // check for ship sunk (either user or cpu) - if true - display gameOver
+  function isShipSunk() {
+    if (cpuShip.isSunk() || userShip.isSunk()) {
+      return true;
+    }
+    return false;
+  }
+
+  // only to be run if isShipSunk - checks for winner and displays results
   function gameOverDisplay() {
     // if cpu ship sunk / user wins
     if (cpuShip.isSunk()) {
@@ -221,14 +221,6 @@ function play() {
       // change background color to red (defeat)
       directionsContainer.style.backgroundColor = "red";
     }
-  }
-
-  // check for ship sunk (either user or cpu) - if true - display gameOver
-  function isShipSunk() {
-    if (cpuShip.isSunk() || userShip.isSunk()) {
-      return true;
-    }
-    return false;
   }
 
   function battle() {
@@ -255,6 +247,12 @@ function play() {
       }
     }
   }
+
+  // create an initial grid for gameboard
+  createGrid();
+
+  // display user position on grid
+  showUserShipOnGrid();
 
   battle();
 }
