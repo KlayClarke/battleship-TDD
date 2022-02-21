@@ -1,11 +1,15 @@
 import { shipFactory, gameBoard } from "./script";
 import { checkUserShipPosition, cpuShipPositionRandom } from "./mocks";
 
+// mock initialization start
+
 let gameboard = gameBoard(10, 10);
 let cpuShip = shipFactory(4, 1);
 let userShip = shipFactory(4, 1);
 gameboard.addShip(cpuShip);
 gameboard.addShip(userShip);
+
+// mock initialization end
 
 test("test ship factory add initial position", () => {
   cpuShip.setInitialPosition(37);
@@ -63,42 +67,49 @@ test("user ship positioned within bounds of user territory", () => {
 
 test("check for cpu ship position randomization min (must equal 1 not 0)", () => {
   let randoms = [];
-  for (let i = 0; i < 10000; i++) {
-    let random = cpuShipPositionRandom(4, 10, 10);
+  for (let i = 0; i < 100000; i++) {
+    let random = cpuShipPositionRandom(
+      cpuShip.length,
+      gameboard.length,
+      gameboard.width
+    );
     randoms.push(random);
   }
 
   randoms.sort(function (a, b) {
     return a - b;
   });
+
+  console.log(randoms[0]);
 
   expect(randoms[0]).toBe(1);
 });
 
 test("check for cpu ship position randomization max (must be equal to 50 on 10x10 board)", () => {
   let randoms = [];
-  for (let i = 0; i < 10000; i++) {
-    let random = cpuShipPositionRandom(4, 10, 10);
+  for (let i = 0; i < 100000; i++) {
+    let random = cpuShipPositionRandom(
+      cpuShip.length,
+      gameboard.length,
+      gameboard.width
+    );
     randoms.push(random);
   }
 
   randoms.sort(function (a, b) {
     return a - b;
   });
-  expect(randoms[9898]).toBe(50);
+
+  expect(randoms[99999]).toBe(47);
 });
 
-test("check if cpu ship position randomization is always within cpu territory", () => {
-  let boardLength = 10;
-  let boardWidth = 10;
-  let shipLength = 4;
-
+test("check if cpu ship position randomization returns legal positions", () => {
   function testBounds() {
     for (let i = 0; i < 10000; i++) {
       let randomNum = cpuShipPositionRandom(
-        shipLength,
-        boardLength,
-        boardWidth
+        cpuShip.length,
+        gameboard.length,
+        gameboard.width
       );
       // check that cpu random position is within cpu territory bounds
       if (randomNum < 0 || randomNum > 50) {
@@ -108,7 +119,7 @@ test("check if cpu ship position randomization is always within cpu territory", 
       // means that the ship will be hanging off edge of gameboard
       if (
         randomNum.toString().length == 1 &&
-        randomNum > boardLength - (shipLength - 1)
+        randomNum > gameboard.length - (cpuShip.length - 1)
       ) {
         return false;
       }
@@ -116,7 +127,7 @@ test("check if cpu ship position randomization is always within cpu territory", 
       // means that the ship will be hanging off edge of gameboard
       if (
         randomNum.toString().length > 1 &&
-        randomNum.toString()[1] > boardLength - (shipLength - 1)
+        randomNum.toString()[1] > gameboard.length - (cpuShip.length - 1)
       ) {
         return false;
       }
@@ -129,14 +140,20 @@ test("check if cpu ship position randomization is always within cpu territory", 
   expect(testBounds()).toBe(true);
 });
 
-// test("check if cpu ship position returns falsy when falsy", () => {
-//   let boardLength = 10;
-//   let shipLength = 4;
+test("check that cpu randomization doesnt return two digit nums ending in 0", () => {
+  function test() {
+    for (let i = 0; i < 10000; i++) {
+      let num = cpuShipPositionRandom(
+        cpuShip.length,
+        gameboard.length,
+        gameboard.width
+      );
 
-//   function testBounds() {
-//     for (let i = 0; i < 10000; i++) {
-//       let num = cpuShipPositionRandom(4, 10, 10);
-
-//     }
-//   }
-// });
+      if (num.toString()[1] == 0 && num.toString()[1] !== undefined) {
+        return false;
+      }
+    }
+    return true;
+  }
+  expect(test()).toBe(true);
+});
