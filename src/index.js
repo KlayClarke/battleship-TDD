@@ -1,4 +1,4 @@
 import {} from "./script";
-import { play } from "./gameBoard";
+import { play } from "./play";
 
 play();
