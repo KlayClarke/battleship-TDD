@@ -155,3 +155,15 @@ test("check that cpu randomization doesnt return two digit nums ending in 0", ()
   }
   expect(test()).toBe(true);
 });
+
+test("test set all positions param on ship factory", () => {
+  cpuShip.setInitialPosition(37);
+  cpuShip.setAllPositions();
+  expect(cpuShip.allPositions).toEqual([37, 38, 39, 40]);
+});
+
+test("test set all positions param on ship factory v2", () => {
+  userShip.setInitialPosition(75);
+  userShip.setAllPositions();
+  expect(userShip.allPositions).toEqual([75, 76, 77, 78]);
+});
