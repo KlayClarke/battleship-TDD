@@ -13,6 +13,11 @@ export function play() {
   let userShip = shipFactory(4, 1);
   gameboard.addShip(cpuShip);
   gameboard.addShip(userShip);
+  cpuShip.randomizeCPUShipPosition(
+    cpuShip.length,
+    gameboard.length,
+    gameboard.width
+  );
 
   // check user position before creating and placing ship
   // for user position, check -- for cpu position, use a similar function to randomize
