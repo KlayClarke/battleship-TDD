@@ -18,6 +18,13 @@
   margin-top: 50px;
 }
 
+#end-result {
+  text-align: center;
+  font-size: large;
+  color: white;
+  margin-top: 50px;
+}
+
 .grid-container {
   width: 60%;
   display: grid;
