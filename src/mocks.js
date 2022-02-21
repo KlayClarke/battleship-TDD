@@ -20,16 +20,20 @@ function checkUserShipPosition( // user ship
 function cpuShipPositionRandom(shipLength, boardLength, boardWidth) {
   let max = (boardLength * boardWidth) / 2;
   let randomInt = Math.floor(Math.random() * max) + 1;
+
+  // make sure random int is within cpu territory bounds
+  // check for 1 digit nums
+  // check for 2 digit nums
+
   while (
-    !(
-      randomInt > 0 &&
-      randomInt <= max &&
-      (randomInt.toString().length == 1 ||
-        parseInt(randomInt.toString()[1]) <= boardLength - (shipLength - 1))
-    )
+    (randomInt.toString().length == 1 &&
+      randomInt > boardLength - (shipLength - 1)) ||
+    (randomInt.toString().length > 1 &&
+      randomInt.toString()[1] > boardLength - (shipLength - 1))
   ) {
     randomInt = Math.floor(Math.random() * max) + 1;
   }
+
   return randomInt;
 }
 
