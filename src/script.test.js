@@ -80,8 +80,6 @@ test("check for cpu ship position randomization min (must equal 1 not 0)", () =>
     return a - b;
   });
 
-  console.log(randoms[0]);
-
   expect(randoms[0]).toBe(1);
 });
 
