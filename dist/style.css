@@ -1,0 +1,36 @@
+* {
+  margin: 0;
+  padding: 0;
+  /* background-color: lightgray; */
+}
+
+#lower {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin-top: 50px;
+}
+
+.grid-container {
+  width: 100%;
+  display: grid;
+}
+
+.grid-item {
+  border: 1px solid rgb(255, 255, 255);
+  display: inline-flex;
+  background-color: rgba(16, 112, 112, 0.546);
+  align-items: center;
+  justify-content: center;
+  color: rgb(255, 255, 255);
+}
+
+.target:hover {
+  background-color: lightgray;
+  cursor: crosshair;
+}
+
+.disable:hover {
+  cursor: not-allowed;
+}
