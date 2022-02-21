@@ -63,7 +63,7 @@ const shipFactory = (length, width) => {
 
   ship.dimensions = [ship.length, ship.width];
 
-  ship.initalPosition = 0;
+  ship.initalPosition;
 
   // a list of each grid that contains a piece of this ship
   ship.allPositions = [];
@@ -95,18 +95,25 @@ const shipFactory = (length, width) => {
     let max = (boardLength * boardWidth) / 2;
     let randomInt = Math.floor(Math.random() * max) + 1;
 
-    // algo gets random numbers until they meet the criteria below, then returns current random num as cpu randomized pos
+    // make sure random int is within cpu territory bounds
+    // check for 1 digit nums
+    // check for 2 digit nums
+
     while (
-      !(
-        randomInt > 0 &&
-        randomInt <= max &&
-        (randomInt.toString().length == 1 ||
-          parseInt(randomInt.toString()[1]) <= boardLength - (shipLength - 1))
-      )
+      // check for 1 digit nums - if 1 digit, must be less than or equal to board length - (ship length - 10)
+      (randomInt.toString().length == 1 &&
+        randomInt > boardLength - (shipLength - 1)) ||
+      randomInt.toString()[1] == 0 ||
+      // check for 2 digit nums - if 2 digit, 2nd digit must be less than or equal to board length - (ship length - 10)
+      (randomInt.toString().length > 1 &&
+        parseInt(randomInt.toString()[1]) > boardLength - (shipLength - 1))
     ) {
       randomInt = Math.floor(Math.random() * max) + 1;
     }
-    return randomInt;
+
+    console.log(randomInt);
+
+    this.initalPosition = randomInt;
   };
 
   return ship;
