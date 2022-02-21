@@ -68,9 +68,6 @@ const shipFactory = (length, width) => {
   // a list of each grid that contains a piece of this ship
   ship.allPositions = [];
 
-  // a list of all positions hit
-  ship.positionsHit = [];
-
   // the initial placement of ship - more specifically, where the ship's top left corner is placed
   ship.setInitialPosition = function (pos) {
     this.initalPosition = pos;
@@ -89,8 +86,11 @@ const shipFactory = (length, width) => {
 
   // every time a ship's position is hit, decrease length by one and log position
   ship.hit = function (pos) {
-    this.positions.includes(pos) ? this.positionsHit.push(pos) : null;
-    this.positions.filter((position) => position != pos);
+    this.allPositions.includes(pos)
+      ? (this.allPositions = this.allPositions.filter(
+          (position) => position != pos
+        ))
+      : null;
   };
 
   // if ship has no positions left, it has sunk - return true, else false
@@ -121,8 +121,6 @@ const shipFactory = (length, width) => {
     ) {
       randomInt = Math.floor(Math.random() * max) + 1;
     }
-
-    console.log(randomInt);
 
     this.initalPosition = randomInt;
   };
