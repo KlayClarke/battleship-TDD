@@ -36,7 +36,18 @@ function cpuShipPositionRandom(shipLength, boardLength, boardWidth) {
   return randomInt;
 }
 
+function cpuRandomHitAttempt(userShipLength, boardLength, boardWidth) {
+  let max = boardLength * boardWidth;
+  let random = Math.floor(Math.random() * max) + 1;
+
+  while (!(random < 101 && random > 50)) {
+    random = Math.floor(Math.random() * max) + 1;
+  }
+  return random;
+}
+
 module.exports = {
   checkUserShipPosition,
   cpuShipPositionRandom,
+  cpuRandomHitAttempt,
 };
