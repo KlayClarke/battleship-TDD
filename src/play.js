@@ -9,12 +9,16 @@ const textContainer = document.querySelector("#text");
 
 export function play() {
   let gameboard = gameBoard(10, 10);
-  let cpuShip = shipFactory(4, 1, 34);
-  let userShip = shipFactory(4, 1, 137);
+  let cpuShip = shipFactory(4, 1);
+  let userShip = shipFactory(4, 1);
   gameboard.addShip(cpuShip);
   gameboard.addShip(userShip);
 
-  let dimensions = [12, 12];
+  // check user position before creating and placing ship
+  // for user position, check -- for cpu position, use a similar function to randomize
+  // allow fn to be called and return a logically sound initial position for cpu
+
+  let dimensions = gameboard.dimensions;
 
   let dmzLine = (dimensions[0] * dimensions[1]) / 2 + 1;
 
