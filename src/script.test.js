@@ -1,5 +1,9 @@
 import { shipFactory, gameBoard } from "./script";
-import { checkUserShipPosition, cpuShipPositionRandom } from "./mocks";
+import {
+  checkUserShipPosition,
+  cpuShipPositionRandom,
+  cpuRandomHitAttempt,
+} from "./mocks";
 
 // mock initialization start
 
@@ -191,4 +195,29 @@ test("test ship is sunk for user ship with all positions hit", () => {
   userShip.hit(77);
   userShip.hit(78);
   expect(userShip.isSunk()).toBe(true);
+});
+
+test("test whether cpu random hit is within user territory", () => {
+  let randoms = [];
+  for (let i = 0; i < 100000; i++) {
+    let random = cpuRandomHitAttempt(
+      userShip.length,
+      gameboard.length,
+      gameboard.width
+    );
+
+    randoms.push(random);
+  }
+
+  function test() {
+    for (let num of randoms) {
+      if (num > 100 || num < 51) {
+        console.log(num);
+        return false;
+      }
+    }
+    return true;
+  }
+
+  expect(test()).toBe(true);
 });
