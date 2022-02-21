@@ -1,15 +1,19 @@
 import { gameBoard, shipFactory } from "./script";
 
 const grid = document.querySelector(".grid-container");
+const directionsContainer = document.querySelector("#directions");
 const replayButton = document.querySelector("button");
-const endResultTextContainer = document.querySelector("#end-result");
-
-// must clear gameboard grid before replaying
-// pop up modal with results of current match and replay button
-// randomize ai hits - if ai hits user, encourage ai to hit in spots beside recent hit
-//// if ai hits user at 76, ai should hit for nums in that range (71 - 80)
 
 function play() {
+  let currentTurn = 1;
+
+  let cpuSuccessfulHits = [];
+  let cpuAllAttemptedHits = [];
+
+  // clear end result text container - only matters if user is replaying
+  directionsContainer.innerHTML = "";
+  directionsContainer.style.backgroundColor = "";
+
   // create gameboard
   let gameboard = gameBoard(10, 10);
 
@@ -82,19 +86,85 @@ function play() {
       : item.classList.add("target");
   }
 
+  // to mark hit attempts on grid - if successful, this style is overrided by markShipHit class
+  function markAttemptedHit(id) {
+    for (let item of gridItems) {
+      if (item.id == id) {
+        item.classList.add("attempt");
+      }
+    }
+  }
+
   // to mark successful ship hits on grid
   function markShipHit(id) {
     for (let item of gridItems) {
       if (item.id == id) {
-        item.innerHTML = "X";
         item.classList.add("hit");
       }
     }
   }
 
+  // when a grid spot has been hit, remove id num on grid to visually represent this action
+  function removeGridLabel(id) {
+    for (let grid of gridItems) {
+      if (grid.id == id) {
+        grid.innerText = "";
+      }
+    }
+  }
+
+  function showUserShipOnGrid() {
+    for (let grid of gridItems) {
+      for (let pos of userShip.allPositions) {
+        if (grid.id == pos) {
+          grid.classList.add("user-ship");
+        }
+      }
+    }
+  }
+
+  showUserShipOnGrid();
+
+  function cpuRandomHitAttempt(boardLength, boardWidth) {
+    let max = boardLength * boardWidth;
+    let random = Math.floor(Math.random() * max) + 1;
+    // if cpu has successful hits, hit around the success
+    if (cpuSuccessfulHits.length > 0) {
+      cpuSuccessfulHits.sort(function (a, b) {
+        return a - b;
+      });
+      while (
+        !(
+          (random < 101 &&
+            random > 50 &&
+            random > cpuSuccessfulHits[0] - 6 &&
+            random < cpuSuccessfulHits[0] + 6) ||
+          (cpuAllAttemptedHits.length && cpuAllAttemptedHits.includes(random))
+        )
+      ) {
+        random = Math.floor(Math.random() * max) + 1;
+      }
+    } else {
+      // if not successful hits
+      while (
+        !(
+          (random < 101 && random > 50) ||
+          (cpuAllAttemptedHits.length && cpuAllAttemptedHits.includes(random))
+        )
+      ) {
+        random = Math.floor(Math.random() * max) + 1;
+      }
+    }
+    return random;
+  }
+
   // if grid item id in cpuShip position, register hit
   // else handle wrong hit, disallow a hit in same spot - mark hit spots by using X
-  function registerHitAttempt(e) {
+  function registerUserHitAttempt(e) {
+    // clear targeted grid's id label
+    removeGridLabel(e.target.id);
+    // mark attempted hit
+    markAttemptedHit(e.target.id);
     // all cpu ship positions prior to attempted hit
     let positions = cpuShip.allPositions;
     // send hit
@@ -103,23 +173,38 @@ function play() {
     let newPositions = cpuShip.allPositions;
     // if hit is successful, register hit
     if (positions.length > newPositions.length) {
-      //   markShipHit(e.target.id);
-      console.log("ship hit");
+      // mark ship hit
       markShipHit(e.target.id);
+      // display message explaining result
+      directionsContainer.innerText = "you hit the enemy";
     }
-    // if cpu ship is sunk, REGISTER GAME END
-    if (gameOver()) {
-      console.log("game over");
-      gameOverDisplay();
-    }
+    currentTurn++;
+    battle();
   }
 
-  // check for ship sunk (either user or cpu) - return true if true
-  function gameOver() {
-    if (cpuShip.isSunk() || userShip.isSunk()) {
-      return true;
+  function registerCPUHitAttempt(hitPosition) {
+    // clear targeted grid's id label
+    removeGridLabel(hitPosition);
+    // mark attempted hit
+    markAttemptedHit(hitPosition);
+    // all user positions prior to attempted hit
+    let positions = userShip.allPositions;
+    // send hit
+    userShip.hit(parseInt(hitPosition));
+    // all user positions after attempted hit
+    let newPositions = userShip.allPositions;
+    // if hit is successful, register hit
+    if (positions.length > newPositions.length) {
+      // mark ship hit
+      markShipHit(hitPosition);
+      // push position to cpu successful attempted hits list at head of file
+      cpuSuccessfulHits.push(hitPosition);
+      // display message explaining result
+      directionsContainer.innerText = "you got hit";
     }
-    return false;
+    cpuAllAttemptedHits.push(hitPosition);
+    currentTurn++;
+    battle();
   }
 
   // only to be run if gameOver() - checks for winner and displays results
@@ -127,27 +212,60 @@ function play() {
     // if cpu ship sunk / user wins
     if (cpuShip.isSunk()) {
       // congratulate user
-      endResultTextContainer.innerText = "Congratulations. You Won!";
+      directionsContainer.innerText = "Congratulations. You Won!";
       // change background color to green (victory)
-      endResultTextContainer.style.backgroundColor = "green";
+      directionsContainer.style.backgroundColor = "green";
     } else if (userShip.isSunk()) {
       // cheer user up
-      endResultTextContainer.innerText = "We'll get them next time, champ!";
+      directionsContainer.innerText = "We'll get them next time, champ!";
       // change background color to red (defeat)
-      endResultTextContainer.style.backgroundColor = "red";
+      directionsContainer.style.backgroundColor = "red";
     }
   }
 
-  // for each grid item, on click register hit attempt on cpu ship
-  gridItems.forEach((item) =>
-    item.addEventListener("click", registerHitAttempt)
-  );
+  // check for ship sunk (either user or cpu) - if true - display gameOver
+  function isShipSunk() {
+    if (cpuShip.isSunk() || userShip.isSunk()) {
+      return true;
+    }
+    return false;
+  }
+
+  function battle() {
+    console.log({ cpuSuccessfulHits, cpuAllAttemptedHits });
+    if (isShipSunk()) {
+      gameOverDisplay();
+    } else {
+      if (currentTurn % 2 == 1) {
+        // turn is odd, users turn to choose
+        directionsContainer.innerText = "Your turn to choose";
+        gridItems.forEach((item) =>
+          item.addEventListener("click", registerUserHitAttempt)
+        );
+      } else if (currentTurn % 2 == 0) {
+        // turn is even, cpu turn to choose
+        directionsContainer.innerText = "Enemy's turn to attack";
+        setTimeout(function () {
+          let hitPosition = cpuRandomHitAttempt(
+            gameboard.length,
+            gameboard.width
+          );
+          registerCPUHitAttempt(hitPosition);
+        });
+      }
+    }
+  }
+
+  battle();
 }
 
+// initial play on pageload
+play();
+
+// function that reruns play function
 function replay() {
   play();
 }
 
-play();
-
+// when replay button clicked, replay
 replayButton.addEventListener("click", replay);
