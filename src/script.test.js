@@ -72,7 +72,6 @@ test("check for cpu ship position randomization min (must equal 1 not 0)", () =>
     return a - b;
   });
 
-  console.log(randoms[0]);
   expect(randoms[0]).toBe(1);
 });
 
@@ -91,26 +90,53 @@ test("check for cpu ship position randomization max (must be equal to 50 on 10x1
 
 test("check if cpu ship position randomization is always within cpu territory", () => {
   let boardLength = 10;
+  let boardWidth = 10;
   let shipLength = 4;
 
-  // if any numbers in randoms are not in cputerritory grids, means that randomization is not always within cpu territory
-  // return false, else true
   function testBounds() {
     for (let i = 0; i < 10000; i++) {
-      let num = cpuShipPositionRandom(4, 10, 10);
-      if (num > 0 && num < 51) {
-        if (
-          (num.toString().length == 1 &&
-            num <= boardLength - (shipLength - 1)) ||
-          (num.toString()[1] <= boardLength - (shipLength - 1) &&
-            num.toString()[1] > 0)
-        ) {
-          return true;
-        }
+      let randomNum = cpuShipPositionRandom(
+        shipLength,
+        boardLength,
+        boardWidth
+      );
+      // check that cpu random position is within cpu territory bounds
+      if (randomNum < 0 || randomNum > 50) {
+        return false;
+      }
+      // if random pos is 1 digit and the position is greater than board length - (ship length - 1), return false
+      // means that the ship will be hanging off edge of gameboard
+      if (
+        randomNum.toString().length == 1 &&
+        randomNum > boardLength - (shipLength - 1)
+      ) {
+        return false;
+      }
+      // if random pos it 2 digits and the second digit is greater than board length - (ship length - 1), return false
+      // means that the ship will be hanging off edge of gameboard
+      if (
+        randomNum.toString().length > 1 &&
+        randomNum.toString()[1] > boardLength - (shipLength - 1)
+      ) {
+        return false;
       }
     }
-    return false;
+    // if all aforementioned tests pass for each num, it is safe to say that our cpu position randomizer func returns
+    // positions that are within the cpu's territory bounds AND are legal positions for the game of battleship
+    return true;
   }
 
   expect(testBounds()).toBe(true);
 });
+
+// test("check if cpu ship position returns falsy when falsy", () => {
+//   let boardLength = 10;
+//   let shipLength = 4;
+
+//   function testBounds() {
+//     for (let i = 0; i < 10000; i++) {
+//       let num = cpuShipPositionRandom(4, 10, 10);
+
+//     }
+//   }
+// });
