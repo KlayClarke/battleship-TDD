@@ -1,5 +1,3 @@
-const { random } = require("lodash");
-
 function checkUserShipPosition( // user ship
   shipLength,
   shipInitialPosition,

@@ -1,4 +1,2 @@
-import {} from "./script";
-import { play } from "./play";
-
-play();
+// import {} from "./script";
+import * as play from "./play";
