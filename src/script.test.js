@@ -1,76 +1,116 @@
-import { shipFactory, gameBoard, mockPositionCheck } from "./script";
-import { checkShipOnePosition, checkShipTwoPosition } from "./script";
+import { shipFactory, gameBoard } from "./script";
+import { checkUserShipPosition, cpuShipPositionRandom } from "./mocks";
 
-// test("test ship is sunk", () => {
-//   expect(shipOne.isSunk()).toBe(false);
-// });
+let gameboard = gameBoard(10, 10);
+let cpuShip = shipFactory(4, 1);
+let userShip = shipFactory(4, 1);
+gameboard.addShip(cpuShip);
+gameboard.addShip(userShip);
 
-test("test ship dimension", () => {
+test("test ship factory add initial position", () => {
+  cpuShip.setInitialPosition(37);
+  expect(cpuShip.initalPosition).toBe(37);
+});
+
+test("test board check user position", () => {
+  userShip.setInitialPosition(35);
+  expect(gameboard.checkUserShipPosition()).toBe(false);
+});
+
+test("test ship dimensions are equal", () => {
   expect(cpuShip.dimensions).toEqual(userShip.dimensions);
 });
 
-// test("test ship hit", () => {
-//   shipOne.hit([10, 10]);
-//   expect(shipOne.positionsHit).toEqual([[10, 10]]);
-// });
-
-test("test gameboard dimensions", () => {
-  expect(gameboard.dimensions).toEqual([10, 10]);
+test("test ship dimensions are correct", () => {
+  expect(userShip.dimensions).toEqual([4, 1]);
 });
 
-test("test gameboard change dimensions mechanic ", () => {
-  gameboard.changeDimensions(15, 15);
-  expect(gameboard.dimensions).toEqual([15, 15]);
+test("user ship positioned in cpu territory", () => {
+  userShip.setInitialPosition(12);
+  expect(
+    checkUserShipPosition(
+      userShip.length,
+      userShip.initalPosition,
+      gameboard.length,
+      gameboard.width
+    )
+  ).toBe(false);
 });
 
-test("check user ship position", () => {
-  expect(gameboard.checkUserShipPosition()).toBe(137);
+test("user ship positioned slightly out of user territory", () => {
+  userShip.setInitialPosition(78);
+  expect(
+    checkUserShipPosition(
+      userShip.length,
+      userShip.initalPosition,
+      gameboard.length,
+      gameboard.width
+    )
+  ).toBe(false);
 });
 
-test("test position of small ship one for 20 x 20 grid", () => {
-  let shipL = 5;
-  let shipW = 1;
-  let shipX = 4;
-  let shipY = 1;
-  let boardL = 20;
-  let boardW = 20;
-  expect(checkShipOnePosition(shipL, shipW, shipX, shipY, boardL, boardW)).toBe(
-    true
-  );
+test("user ship positioned within bounds of user territory", () => {
+  userShip.setInitialPosition(66);
+  expect(
+    checkUserShipPosition(
+      userShip.length,
+      userShip.initalPosition,
+      gameboard.length,
+      gameboard.width
+    )
+  ).toBe(true);
 });
 
-test("test position of small ship one for 20 x 20 grid", () => {
-  let shipL = 5;
-  let shipW = 2;
-  let shipX = 1;
-  let shipY = 11;
-  let boardL = 20;
-  let boardW = 20;
-  expect(checkShipTwoPosition(shipL, shipW, shipX, shipY, boardL, boardW)).toBe(
-    true
-  );
+test("check for cpu ship position randomization min (must equal 1 not 0)", () => {
+  let randoms = [];
+  for (let i = 0; i < 10000; i++) {
+    let random = cpuShipPositionRandom(4, 10, 10);
+    randoms.push(random);
+  }
+
+  randoms.sort(function (a, b) {
+    return a - b;
+  });
+
+  console.log(randoms[0]);
+  expect(randoms[0]).toBe(1);
 });
 
-test("test position of big ship one touching border of 100 x 100 grid", () => {
-  let shipL = 13;
-  let shipW = 10;
-  let shipX = 88;
-  let shipY = 41;
-  let boardL = 100;
-  let boardW = 100;
-  expect(checkShipOnePosition(shipL, shipW, shipX, shipY, boardL, boardW)).toBe(
-    true
-  );
+test("check for cpu ship position randomization max (must be equal to 50 on 10x10 board)", () => {
+  let randoms = [];
+  for (let i = 0; i < 10000; i++) {
+    let random = cpuShipPositionRandom(4, 10, 10);
+    randoms.push(random);
+  }
+
+  randoms.sort(function (a, b) {
+    return a - b;
+  });
+  expect(randoms[9898]).toBe(50);
 });
 
-test("test position of big ship two touching border of 100 x 100 grid", () => {
-  let shipL = 20;
-  let shipW = 2;
-  let shipX = 81;
-  let shipY = 51;
-  let boardL = 100;
-  let boardW = 100;
-  expect(checkShipTwoPosition(shipL, shipW, shipX, shipY, boardL, boardW)).toBe(
-    true
-  );
+test("check if cpu ship position randomization is always within cpu territory", () => {
+  let boardLength = 10;
+  let shipLength = 4;
+
+  // if any numbers in randoms are not in cputerritory grids, means that randomization is not always within cpu territory
+  // return false, else true
+  function testBounds() {
+    for (let i = 0; i < 10000; i++) {
+      let num = cpuShipPositionRandom(4, 10, 10);
+      if (num > 0 && num < 51) {
+        if (
+          (num.toString().length == 1 &&
+            num <= boardLength - (shipLength - 1)) ||
+          (num.toString()[1] <= boardLength - (shipLength - 1) &&
+            num.toString()[1] > 0)
+        ) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
+  expect(testBounds()).toBe(true);
 });
