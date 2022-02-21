@@ -76,6 +76,17 @@ const shipFactory = (length, width) => {
     this.initalPosition = pos;
   };
 
+  // to populate all positions with each grid item that the ship is within
+  ship.setAllPositions = function () {
+    for (
+      let i = this.initalPosition;
+      i < this.initalPosition + this.length;
+      i++
+    ) {
+      this.allPositions.push(i);
+    }
+  };
+
   // every time a ship's position is hit, decrease length by one and log position
   ship.hit = function (pos) {
     this.positions.includes(pos) ? this.positionsHit.push(pos) : null;
